@@ -1,56 +1,63 @@
 import re
 import string
+import getpass
+from collections import OrderedDict
 
 
-def check_pwd_length_and_whitespace(pwd):
-    if not (' ' in pwd):
-        min_length_pwd = 6
-        max_length_pwd = 24
-        if min_length_pwd <= len(pwd) <= max_length_pwd:
-            return len(pwd)
+def check_password_length_and_whitespace(password):
+    if not (' ' in password):
+        min_length_password = 6
+        max_length_password = 24
+        if min_length_password <= len(password) <= max_length_password:
+            return len(password)
 
 
-def is_pwd_in_ignor_pwd_list(pwd):
-    with open('ignor_pwd', 'r', encoding='utf-8') as file:
-        ignor_pwd_list = [ignor_pwd.rstrip() for ignor_pwd in file.readlines()]
-    return pwd in ignor_pwd_list
+def get_ignor_password_list():
+    with open('ignor_password', 'r', encoding='utf-8') as file:
+        ignor_password_list = [
+            ignor_password.rstrip()
+            for ignor_password in file.readlines()
+        ]
+    return ignor_password_list
 
 
-def clear_duplicate_symbol(pwd):
-    simbol_pwd_list = [pwd[0]]
-    for index in range(1, len(pwd)):
-        if not pwd[index] == pwd[index - 1]:
-            simbol_pwd_list.append(pwd[index])
-    return ''.join(simbol_pwd_list)
+def is_pasword_ignor(password, ignor_password_list):
+    return password in ignor_password_list
 
 
-def count_lower_letters(pwd):
+def clear_duplicate_symbol(password):
+    return "".join(OrderedDict.fromkeys(password))
+
+
+def get_number_lowercase_letters(password):
     number_lower_letters = sum(
-        [1 for char in pwd if char.isalpha() and char.islower()]
+        [1 for char in password if char.islower()]
     )
     return number_lower_letters
 
 
-def count_upper_letters(pwd):
+def get_number_uppercase_letters(password):
     number_upper_letters = sum(
-        [1 for char in pwd if char.isalpha() and char.isupper()]
+        [1 for char in password if char.isupper()]
     )
     return number_upper_letters
 
 
-def count_digits(pwd):
+def get_number_digits(password):
     number_digits = sum(
-        [1 for char in pwd if char.isdigit()]
+        [1 for char in password if char.isdigit()]
     )
     return number_digits
 
 
-def count_spec_symbol(pwd):
-    symbol_list = re.findall(r'[{}]'.format(string.punctuation), pwd)
+def get_number_spec_symbol(password):
+    symbol_list = re.findall(r'[{}]'.format(
+        string.punctuation), password
+    )
     return len(symbol_list)
 
 
-def appreciate_symbol_in_pwd(number_symbol):
+def appreciate_symbol_in_password(number_symbol):
     max_rating = 2
     min_rating = 1
     if number_symbol > 1:
@@ -60,48 +67,45 @@ def appreciate_symbol_in_pwd(number_symbol):
     return 0
 
 
-def password_len_rating(pwd):
+def password_len_rating(password):
     max_rating = 2
     min_rating = 1
-    len_pwd = len(pwd)
-    if len_pwd >= 18:
+    len_password = len(password)
+    if len_password >= 18:
         return max_rating
-    elif len_pwd >= 12:
+    elif len_password >= 12:
         return min_rating
     return 0
 
 
-def get_password_strength(pwd):
-    rating_pwd = 0
-    rating_pwd += password_len_rating(pwd)
-    pwd = clear_duplicate_symbol(pwd)
-    number_lower_letters = count_lower_letters(pwd)
-    number_upper_letters = count_upper_letters(pwd)
-    number_digits = count_digits(pwd)
-    number_spec_symbol = count_spec_symbol(pwd)
-    for number_symbol in number_lower_letters, number_upper_letters, number_digits, number_spec_symbol:
-        rating_pwd += appreciate_symbol_in_pwd(number_symbol)
-    return rating_pwd
-
-
-def main():
-    while True:
-        pwd = input(
-            'Enter the password (from 6 to 24 characters) or "quit" to exit: '
-        )
-        if pwd == 'quit':
-            print ('The script is completed')
-            break
-        elif is_pwd_in_ignor_pwd_list(pwd) or not check_pwd_length_and_whitespace(pwd):
-            print('Invalid password entered!')
-            continue
-        password_strength = get_password_strength(pwd)
-        print(
-            'Password rating {} points from 10 points.'.format(
-                password_strength
-            )
-        )
+def get_password_strength(password):
+    rating_password = 0
+    rating_password += password_len_rating(password)
+    password = clear_duplicate_symbol(password)
+    number_lowercase_letters = get_number_lowercase_letters(password)
+    number_uppercase_letters = get_number_uppercase_letters(password)
+    number_digits = get_number_digits(password)
+    number_spec_symbol = get_number_spec_symbol(password)
+    for number_symbol in [number_lowercase_letters,
+                          number_uppercase_letters,
+                          number_digits,
+                          number_spec_symbol
+                          ]:
+        rating_password += appreciate_symbol_in_password(number_symbol)
+    return rating_password
 
 
 if __name__ == '__main__':
-    main()
+    password = getpass.getpass(
+        'Enter the password (from 6 to 24 characters) or "quit" to exit: '
+    )
+    if password == 'quit':
+        print('The script is completed')
+    elif is_pasword_ignor(password, get_ignor_password_list()) or not check_password_length_and_whitespace(password):
+        print('Invalid password entered!')
+    password_strength = get_password_strength(password)
+    print(
+        'Password rating {} points from 10 points.'.format(
+            password_strength
+        )
+    )
