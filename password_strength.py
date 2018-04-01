@@ -1,6 +1,19 @@
 import re
 import string
 import getpass
+import argparse
+
+def get_args():
+    parser = argparse.ArgumentParser(
+        description='The script evaluates the entered password from 1 to 10.'
+    )
+    parser.add_argument(
+        '-b',
+        '--blacklist',
+        help='path to blacklist',
+        default='blacklist'
+    )
+    return parser.parse_args()
 
 
 def check_password_length(password):
@@ -10,15 +23,18 @@ def check_password_length(password):
         return len(password)
 
 
-def load_black_list():
-    with open('blacklist', 'r', encoding='utf-8') as file:
-        ignor_password_list = [
-            ignor_password.rstrip() for ignor_password in file.readlines()
-        ]
-    return ignor_password_list
+def load_black_list(path_to_black_list):
+    try:
+        with open(path_to_black_list, 'r', encoding='utf-8') as file:
+            ignor_password_list = [
+                ignor_password.rstrip() for ignor_password in file.readlines()
+            ]
+        return ignor_password_list
+    except FileNotFoundError:
+        return None
 
 
-def is_pasword_ignor(password, black_list):
+def is_password_ignored(password, black_list):
     return password in black_list
 
 
@@ -85,15 +101,19 @@ def get_password_strength(password):
                           number_uppercase_letters,
                           number_digits,
                           number_spec_symbol
-                          ]:
+    ]:
         rating_password += get_symbols_rating(number_symbol)
     return rating_password
 
 
 if __name__ == '__main__':
-    password = getpass.getpass('Enter the password (from 6 to 24 characters): ')
-    pasword_ignor = is_pasword_ignor(password, load_black_list())
-    if pasword_ignor or not check_password_length(password):
+    path_to_black_list = get_args().blacklist
+    black_list = load_black_list(path_to_black_list)
+    if black_list is None:
+        exit('File blacklist passwords not found!')
+    password = getpass.getpass('Enter the password (from 6 to 32 characters): ')
+    password_ignored = is_password_ignored(password, black_list)
+    if password_ignored or not check_password_length(password):
         exit('Invalid password entered!')
     password_strength = get_password_strength(password)
     print(
