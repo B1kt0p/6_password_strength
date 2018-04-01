@@ -6,7 +6,7 @@ The script evaluates the entered password from 1 to 10:
 
 The password must be 6 to 32 characters long,
 and not be included in the list of forbidden passwords specified 
-in the file 'blacklist'.  
+in blacklist.  
 Download by blacklist by link [https://github.com/B1kt0p/blacklist](https://github.com/B1kt0p/blacklist).     
 
 Black list format:
