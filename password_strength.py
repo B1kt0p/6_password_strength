@@ -1,7 +1,6 @@
 import re
 import string
 import getpass
-from collections import OrderedDict
 
 
 def check_password_length_and_whitespace(password):
@@ -12,8 +11,8 @@ def check_password_length_and_whitespace(password):
             return len(password)
 
 
-def get_ignor_password_list():
-    with open('ignor_password', 'r', encoding='utf-8') as file:
+def load_black_list():
+    with open('blacklist', 'r', encoding='utf-8') as file:
         ignor_password_list = [
             ignor_password.rstrip()
             for ignor_password in file.readlines()
@@ -21,12 +20,12 @@ def get_ignor_password_list():
     return ignor_password_list
 
 
-def is_pasword_ignor(password, ignor_password_list):
-    return password in ignor_password_list
+def is_pasword_ignor(password, black_list):
+    return password in black_list
 
 
 def clear_duplicate_symbol(password):
-    return "".join(OrderedDict.fromkeys(password))
+    return ''.join(set(password))
 
 
 def get_number_lowercase_letters(password):
@@ -51,13 +50,14 @@ def get_number_digits(password):
 
 
 def get_number_spec_symbol(password):
-    symbol_list = re.findall(r'[{}]'.format(
-        string.punctuation), password
+    symbol_list = re.findall(
+        r'[{}]'.format(string.punctuation),
+        password
     )
     return len(symbol_list)
 
 
-def appreciate_symbol_in_password(number_symbol):
+def get_symbols_rating(number_symbol):
     max_rating = 2
     min_rating = 1
     if number_symbol > 1:
@@ -91,18 +91,18 @@ def get_password_strength(password):
                           number_digits,
                           number_spec_symbol
                           ]:
-        rating_password += appreciate_symbol_in_password(number_symbol)
+        rating_password += get_symbols_rating(number_symbol)
     return rating_password
 
 
 if __name__ == '__main__':
     password = getpass.getpass(
-        'Enter the password (from 6 to 24 characters) or "quit" to exit: '
+        'Enter the password (from 6 to 24 characters): '
     )
-    if password == 'quit':
-        print('The script is completed')
-    elif is_pasword_ignor(password, get_ignor_password_list()) or not check_password_length_and_whitespace(password):
+    pasword_ignor = is_pasword_ignor(password, load_black_list())
+    if pasword_ignor or not check_password_length_and_whitespace(password):
         print('Invalid password entered!')
+        exit()
     password_strength = get_password_strength(password)
     print(
         'Password rating {} points from 10 points.'.format(

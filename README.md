@@ -1,6 +1,6 @@
 # Password Strength Calculator
 
-The script evaluates the entered password from 1 to 10. 1 - very weak password, 10 - very steep.
+The script evaluates the entered password from 1 to 10. 1 - very weak password, 10 - very steep.The password must be 6 to 24 characters long, do not contain spaces, and not be included in the list of forbidden passwords specified in the file 'blacklist'.
 # Get started:
 An example of running a script in Linux, Python 3.5 on other operating systems is also:
 ```bash
