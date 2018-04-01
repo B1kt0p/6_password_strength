@@ -3,19 +3,17 @@ import string
 import getpass
 
 
-def check_password_length_and_whitespace(password):
-    if not (' ' in password):
-        min_length_password = 6
-        max_length_password = 24
-        if min_length_password <= len(password) <= max_length_password:
-            return len(password)
+def check_password_length(password):
+    min_length_password = 6
+    max_length_password = 32
+    if min_length_password <= len(password) <= max_length_password:
+        return len(password)
 
 
 def load_black_list():
     with open('blacklist', 'r', encoding='utf-8') as file:
         ignor_password_list = [
-            ignor_password.rstrip()
-            for ignor_password in file.readlines()
+            ignor_password.rstrip() for ignor_password in file.readlines()
         ]
     return ignor_password_list
 
@@ -24,36 +22,33 @@ def is_pasword_ignor(password, black_list):
     return password in black_list
 
 
-def clear_duplicate_symbol(password):
+def clear_duplicate_symbols(password):
     return ''.join(set(password))
 
 
-def get_number_lowercase_letters(password):
+def get_lowercase_letters_count(password):
     number_lower_letters = sum(
         [1 for char in password if char.islower()]
     )
     return number_lower_letters
 
 
-def get_number_uppercase_letters(password):
+def get_uppercase_letters_count(password):
     number_upper_letters = sum(
         [1 for char in password if char.isupper()]
     )
     return number_upper_letters
 
 
-def get_number_digits(password):
+def get_digits_count(password):
     number_digits = sum(
         [1 for char in password if char.isdigit()]
     )
     return number_digits
 
 
-def get_number_spec_symbol(password):
-    symbol_list = re.findall(
-        r'[{}]'.format(string.punctuation),
-        password
-    )
+def get_spec_symbol_count(password):
+    symbol_list = re.findall(r'[{}]'.format(string.punctuation), password)
     return len(symbol_list)
 
 
@@ -81,11 +76,11 @@ def password_len_rating(password):
 def get_password_strength(password):
     rating_password = 0
     rating_password += password_len_rating(password)
-    password = clear_duplicate_symbol(password)
-    number_lowercase_letters = get_number_lowercase_letters(password)
-    number_uppercase_letters = get_number_uppercase_letters(password)
-    number_digits = get_number_digits(password)
-    number_spec_symbol = get_number_spec_symbol(password)
+    password = clear_duplicate_symbols(password)
+    number_lowercase_letters = get_lowercase_letters_count(password)
+    number_uppercase_letters = get_uppercase_letters_count(password)
+    number_digits = get_digits_count(password)
+    number_spec_symbol = get_spec_symbol_count(password)
     for number_symbol in [number_lowercase_letters,
                           number_uppercase_letters,
                           number_digits,
@@ -96,16 +91,11 @@ def get_password_strength(password):
 
 
 if __name__ == '__main__':
-    password = getpass.getpass(
-        'Enter the password (from 6 to 24 characters): '
-    )
+    password = getpass.getpass('Enter the password (from 6 to 24 characters): ')
     pasword_ignor = is_pasword_ignor(password, load_black_list())
-    if pasword_ignor or not check_password_length_and_whitespace(password):
-        print('Invalid password entered!')
-        exit()
+    if pasword_ignor or not check_password_length(password):
+        exit('Invalid password entered!')
     password_strength = get_password_strength(password)
     print(
-        'Password rating {} points from 10 points.'.format(
-            password_strength
-        )
+        'Password rating {} points from 10 points.'.format(password_strength)
     )
