@@ -80,7 +80,7 @@ def get_password_strength(password):
     number_lowercase_letters = get_lowercase_letters_count(password)
     number_uppercase_letters = get_uppercase_letters_count(password)
     number_digits = get_digits_count(password)
-    number_spec_symbol = get_spec_symbol_count(password)
+    number_spec_symbol = get_spec_symbols_count(password)
     for number_symbol in [number_lowercase_letters,
                           number_uppercase_letters,
                           number_digits,
