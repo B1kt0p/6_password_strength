@@ -47,7 +47,7 @@ def get_digits_count(password):
     return number_digits
 
 
-def get_spec_symbol_count(password):
+def get_spec_symbols_count(password):
     symbol_list = re.findall(r'[{}]'.format(string.punctuation), password)
     return len(symbol_list)
 
